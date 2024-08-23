@@ -1,4 +1,4 @@
-#import "@preview/fletcher:0.4.5" as fletcher
+#import "@preview/fletcher:0.5.1" as fletcher
 #import fletcher.shapes: diamond, pill, rect, parallelogram
 #import fletcher.deps.cetz.draw
 
@@ -19,16 +19,22 @@
   }
   (
     destination: destination,
-    edge-options: (label: label, marks: "->"),
+    edge-options: (label: label),
   )
+}
+
+#let set-links(element, links) = {
+  let obj = element.value
+  obj.links = links
+  return metadata(obj)
 }
 
 /// Creates a condition with as many choices as needed.
 #let condition(id, content, ..choices) = {
   internal-element(
     id,
-    diamond,
-    content,
+    diamond.with(fit: 0),
+    pad(1em, content),
     choices.pos().map(choice => internal-link(choice.destination, choice.label))
   )
 }

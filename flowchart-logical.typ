@@ -17,11 +17,10 @@
 
 /// Parses the elements from a logical content
 /// and returns an ordered list of elements.
-#let parse-contents(logic, n) = {
+#let parse-contents(logic, n, next-element: none) = {
   assert.eq(type(logic), content, message: "logic parameter has wrong type")
 
   let elements = ()
-  let next-element
 
   let logic-elements = if logic.has("children") { logic.children } else { (logic,) }
 
@@ -42,7 +41,9 @@
     } else if obj.class == "if" {
       let choices = ()
       for (branch-label, branch-logic) in ((obj.yes-label, obj.yes), (obj.no-label, obj.no)) {
-        let branch-elements = parse-contents(branch-logic, n)
+        let branch-elements = parse-contents(branch-logic, n, next-element: next-element)
+        if branch-elements.len() == 0 { continue }
+
         n += branch-elements.len()
         elements += branch-elements.rev()
         choices.push(choice(branch-elements.at(0), label: branch-label))

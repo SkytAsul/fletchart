@@ -90,7 +90,7 @@ Branches order depending on amount of choices:
 }
 
 #let flowchart-create-link-edge(internal-link, from, to) = {
-  edge(vertices: (from, to), ..internal-link.edge-options)
+  edge(vertices: (from, to), marks: "-|>", ..internal-link.edge-options)
 }
 
 #let flowchart-create(internal-elements, debug) = {
