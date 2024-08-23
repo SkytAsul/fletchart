@@ -1,24 +1,24 @@
 #import "@preview/fletcher:0.5.1": diagram, node, edge
 
-#let flowchart-parse-elements(elements-args) = {
-  assert.eq(type(elements-args), content, message: "elements parameter has wrong type")
+#let internal-element(id, shape, content, links) = {
+  metadata((
+    class: "element",
+    id: id,
+    node-options: (shape: shape, label: content),
+    links: links
+  ))
+}
 
-  let internal-elements = (:)
-
-  let elements = if elements-args.has("children") { elements-args.children } else { (elements-args,) }
-
-  for content-piece in elements{
-    assert.eq(content-piece.func(), metadata, message: "Invalid content child type")
-    let obj = content-piece.value
-
-    if obj.class == "element" {
-      internal-elements.insert(obj.id, obj)
-    } else {
-      panic("Unknown object class " + obj.class)
-    }
+#let internal-link(destination, label) = {
+  if type(destination) == content and destination.func() == metadata and destination.value.class == "element" {
+    destination = destination.value.id
+  } else if type(destination) != str {
+    panic("Wrong destination format")
   }
-
-  return internal-elements
+  (
+    destination: destination,
+    edge-options: (label: label),
+  )
 }
 
 #let flowchart-process-links(elements) = {
@@ -116,11 +116,4 @@ Branches order depending on amount of choices:
     }
   }
   diagram(nodes, edges, node-stroke: 1pt, node-outset: 0pt, node-inset: .7em, debug: debug, spacing: 3em)
-}
-
-/// Creates a flowchart based on a list of elements.
-#let fc-declarative(elements, debug: false) = {
-  let internal-elements = flowchart-parse-elements(elements)
-
-  flowchart-create(internal-elements, debug)
 }

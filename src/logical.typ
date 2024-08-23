@@ -1,4 +1,4 @@
-#import "flowchart.typ": fc-declarative
+#import "declarative.typ": fc-declarative
 #import "elements.typ": *
 
 #let logic-action(type, content) = {

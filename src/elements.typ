@@ -1,27 +1,7 @@
-#import "@preview/fletcher:0.5.1" as fletcher
+#import "internals.typ": internal-element, internal-link
+#import "deps.typ": fletcher, cetz
 #import fletcher.shapes: diamond, pill, rect, parallelogram
-#import fletcher.deps.cetz.draw
-
-#let internal-element(id, shape, content, links) = {
-  metadata((
-    class: "element",
-    id: id,
-    node-options: (shape: shape, label: content),
-    links: links
-  ))
-}
-
-#let internal-link(destination, label) = {
-  if type(destination) == content and destination.func() == metadata and destination.value.class == "element" {
-    destination = destination.value.id
-  } else if type(destination) != str {
-    panic("Wrong destination format")
-  }
-  (
-    destination: destination,
-    edge-options: (label: label),
-  )
-}
+#import cetz.draw
 
 #let set-links(element, links) = {
   let obj = element.value
