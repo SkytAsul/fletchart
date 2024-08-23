@@ -1,0 +1,17 @@
+[package]
+name = "fletchart"
+version = "{{VERSION}}"
+entrypoint = "src/lib.typ"
+authors = ["SkytAsul"]
+license = "MIT"
+description = "Create flowcharts easily!"
+repository = "https://github.com/SkytAsul/fletchart"
+keywords = [
+	"diagram",
+	"flowchart",
+	"logic"
+]
+categories = [
+    "visualization"
+]
+exclude = ["examples/", "justfile"]
