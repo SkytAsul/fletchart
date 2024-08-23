@@ -24,9 +24,18 @@
 
   let logic-elements = if logic.has("children") { logic.children } else { (logic,) }
 
-  for content-piece in logic-elements.rev(){
+  let content-accumulator = []
+
+  for (index, content-piece) in logic-elements.rev().enumerate(){
     if content-piece.func() != metadata {
-      content-piece = fc-process(content-piece)
+      content-accumulator = content-piece + content-accumulator
+
+      if index + 1 == logic-elements.len() or logic-elements.at(index - 1).func() == metadata {
+        content-piece = fc-process(content-accumulator)
+        content-accumulator = []
+      } else {
+        continue
+      }
     }
 
     assert.eq(content-piece.func(), metadata, message: "Invalid content child type")
