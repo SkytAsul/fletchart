@@ -9,6 +9,9 @@
       fc-io[Some IO]
   }, {
     [A random process]
+    ```python
+    print("Hello world")
+    ```
     fc-if([Another condition ?], yes-label: "valid", {
       fc-predefined-process()[Predefined\ process]
     }, no-label: "invalid", {
@@ -16,4 +19,4 @@
     })
   })
   fc-end[Followup and end]
-}, debug: true)
+}, if-yes-label: "Yas", if-no-label: "Non", debug: true)

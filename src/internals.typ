@@ -1,10 +1,11 @@
 #import "@preview/fletcher:0.5.1": diagram, node, edge
 
-#let internal-element(id, shape, content, links) = {
+#let internal-element(id, type, content, links) = {
   metadata((
     class: "element",
     id: id,
-    node-options: (shape: shape, label: content),
+    type: type,
+    content: content,
     links: links
   ))
 }
@@ -85,20 +86,33 @@ Branches order depending on amount of choices:
   return layouted
 }
 
-#let flowchart-create-element-node(internal-element, coordinates) = {
-  node(pos: coordinates, ..internal-element.node-options)
+#let resolve-element-style(elements-style-override, element-type, field) = {
+  if element-type.name in elements-style-override {
+    let style-override = elements-style-override.at(element-type.name)
+    if field in style-override {
+      return style-override.at(field)
+    }
+  }
+  return element-type.at(field)
+}
+
+#let flowchart-create-element-node(options, internal-element, coordinates) = {
+  let shape = resolve-element-style(options.elements-style-override, internal-element.type, "shape")
+  let fill = resolve-element-style(options.elements-style-override, internal-element.type, "fill")
+
+  node(pos: coordinates, label: internal-element.content, shape: shape, fill: fill)
 }
 
 #let flowchart-create-link-edge(internal-link, from, to) = {
   edge(vertices: (from, to), marks: "-|>", ..internal-link.edge-options)
 }
 
-#let flowchart-create(internal-elements, debug) = {
+#let flowchart-create(internal-elements, options) = {
   internal-elements = flowchart-process-links(internal-elements)
 
   let layouted = flowchart-layout(internal-elements)
 
-  if debug [
+  if options.debug [
     *Internal elements details:*
     #internal-elements
     
@@ -110,10 +124,10 @@ Branches order depending on amount of choices:
   let nodes = ()
   let edges = ()
   for element in internal-elements.values() {
-    nodes.push(flowchart-create-element-node(element, layouted.at(element.id)))
+    nodes.push(flowchart-create-element-node(options, element, layouted.at(element.id)))
     for link in element.links {
       edges.push(flowchart-create-link-edge(link, layouted.at(element.id), layouted.at(link.destination)))
     }
   }
-  diagram(nodes, edges, node-stroke: 1pt, node-outset: 0pt, node-inset: .7em, debug: debug, spacing: 3em)
+  diagram(nodes, edges, node-stroke: 1pt, node-outset: 0pt, node-inset: .7em, debug: options.debug, spacing: 3em)
 }

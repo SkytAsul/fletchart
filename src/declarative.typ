@@ -22,8 +22,22 @@
 }
 
 /// Creates a flowchart based on a list of elements.
-#let fc-declarative(elements, debug: false) = {
+/// - elements (content): Content of the flowchart.
+/// 
+///   A combination of `action` and `condition` function calls.
+/// 
+/// - elements-style-override (dict): A dictionnary mapping element
+///   type names to a dictionnary of styles. This inner dictionnary
+///   can have `shape` and `fill` fields.
+/// 
+/// - debug (bool): Whether to show debug informations or not.
+#let fc-declarative(elements, elements-style-override: (:), debug: false) = {
   let internal-elements = flowchart-parse-elements(elements)
 
-  flowchart-create(internal-elements, debug)
+  let options = (
+    elements-style-override: elements-style-override,
+    debug: debug
+  )
+
+  flowchart-create(internal-elements, options)
 }
