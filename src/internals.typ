@@ -1,12 +1,12 @@
 #import "@preview/fletcher:0.5.1": diagram, node, edge
 
-#let internal-element(id, type, content, links) = {
+#let internal-element(id, content, links, style-resolver) = {
   metadata((
     class: "element",
     id: id,
-    type: type,
     content: content,
-    links: links
+    links: links,
+    style-resolver: style-resolver
   ))
 }
 
@@ -86,21 +86,10 @@ Branches order depending on amount of choices:
   return layouted
 }
 
-#let resolve-element-style(elements-style-override, element-type, field) = {
-  if element-type.name in elements-style-override {
-    let style-override = elements-style-override.at(element-type.name)
-    if field in style-override {
-      return style-override.at(field)
-    }
-  }
-  return element-type.at(field)
-}
-
 #let flowchart-create-element-node(options, internal-element, coordinates) = {
-  let shape = resolve-element-style(options.elements-style-override, internal-element.type, "shape")
-  let fill = resolve-element-style(options.elements-style-override, internal-element.type, "fill")
+  let style = (internal-element.style-resolver)(options)
 
-  node(pos: coordinates, label: internal-element.content, shape: shape, fill: fill)
+  node(pos: coordinates, label: internal-element.content, ..style)
 }
 
 #let flowchart-create-link-edge(internal-link, from, to) = {

@@ -2,19 +2,52 @@
 #import "elements.typ": *
 #import "utils.typ": map-auto
 
-#let logic-action(type, content) = {
+#let logic-action(type, content, ..node-options) = {
+  assert(node-options.pos().len() == 0, message: "Cannot pass non-named node options.")
   metadata((
     class: "action",
     type: type,
-    content: content
+    content: content,
+    node-options: node-options.named()
   ))
 }
 
-#let fc-process(content) = logic-action(process, content)
-#let fc-predefined-process(content) = logic-action(predefined-process, content)
-#let fc-begin(content) = logic-action(beginning, content)
-#let fc-end(content) = logic-action(end, content)
-#let fc-io(content) = logic-action(input-output, content)
+#let fc-process = logic-action.with(process)
+#let fc-predefined-process = logic-action.with(predefined-process)
+#let fc-begin = logic-action.with(beginning)
+#let fc-end = logic-action.with(end)
+#let fc-io = logic-action.with(input-output)
+
+/// Creates an "if" branching.
+/// - content (content): Content shown on the condition block.
+/// 
+/// - yes (content): Content of the "yes" branch.
+/// 
+///   Same type as the #the-param[fc-logical][content].
+/// 
+/// - yes-label (str, content): Label shown on the "yes" arrow.
+/// 
+/// - no (content): Content of the "no" branch.
+/// 
+///   Same type as the #the-param[fc-logical][content].
+/// 
+/// - no-label (str, content): Label shown on the "no" arrow.
+#let fc-if(content, yes-label: auto, yes, no-label: auto, no, ..node-options) = {
+  // Cannot name it "if" because it's a reserved keyword. Same for "no": cannot name it "else".
+  assert(node-options.pos().len() == 0, message: "Cannot pass non-named node options.")
+  
+  // We do not parse and create the condition element right here
+  // because we lack context on how to decide the ID of the element.
+  metadata((
+    class: "if",
+    content: content,
+    yes-label: yes-label,
+    yes: yes,
+    no-label: no-label,
+    no: no,
+    node-options: node-options.named()
+  ))
+}
 
 /// Parses the elements from a logical content
 /// and returns an ordered list of elements.
@@ -49,7 +82,7 @@
     if obj.class == "action" {
       n += 1
       if obj.type == end { next-element = none }
-      next-element = action(str(n), obj.content, destination: next-element, type: obj.type)
+      next-element = action(str(n), obj.content, destination: next-element, type: obj.type, ..obj.node-options)
       elements.push(next-element)
       if obj.type == beginning { next-element = none }
     } else if obj.class == "if" {
@@ -63,7 +96,7 @@
         choices.push(choice(branch-elements.at(0), label: map-auto(branch-label, branch-label-default)))
       }
       n += 1
-      next-element = condition(str(n), obj.content, ..choices)
+      next-element = condition(str(n), obj.content, ..choices, ..obj.node-options)
       elements.push(next-element)
     } else {
       assert(false, "Unknown object class " + obj.class)
@@ -71,35 +104,6 @@
   }
 
   return elements.rev()
-}
-
-/// Creates an "if" branching.
-/// - content (content): Content shown on the condition block.
-/// 
-/// - yes (content): Content of the "yes" branch.
-/// 
-///   Same type as the #the-param[fc-logical][content].
-/// 
-/// - yes-label (str, content): Label shown on the "yes" arrow.
-/// 
-/// - no (content): Content of the "no" branch.
-/// 
-///   Same type as the #the-param[fc-logical][content].
-/// 
-/// - no-label (str, content): Label shown on the "no" arrow.
-#let fc-if(content, yes-label: auto, yes, no-label: auto, no) = {
-  // Cannot name it "if" because it's a reserved keyword. Same for "no": cannot name it "else".
-  
-  // We do not parse and create the condition element right here
-  // because we lack context on how to decide the ID of the element.
-  metadata((
-    class: "if",
-    content: content,
-    yes-label: yes-label,
-    yes: yes,
-    no-label: no-label,
-    no: no
-  ))
 }
 
 /// Creates a flowchart based on a logical block.

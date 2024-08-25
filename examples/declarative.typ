@@ -1,11 +1,11 @@
 #import "../src/lib.typ" as fletchart
 
-#import fletchart.elements: action, condition, choice, input-output
+#import fletchart.elements: action, condition, choice, input-output, process
 #import fletchart.declarative: fc-declarative
 
 
 #fc-declarative({
-  let actionA = action("a", "A")
+  let actionA = action("a", "A", fill: color.fuchsia)
   let actionB = action("b", "B", destination: actionA)
   let actionC = action("c", "C", destination: "a")
   let actionD = action("d", "D", type: input-output)
@@ -14,4 +14,4 @@
   actionB
   actionA
   actionD
-}, elements-style-override: (input-output.name: (fill: color.red)), debug: true)
+}, elements-style-override: (process.name: (fill: color.orange)), debug: true)

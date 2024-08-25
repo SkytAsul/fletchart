@@ -15,8 +15,8 @@
     fc-if([Another condition ?], yes-label: "valid", {
       fc-predefined-process()[Predefined\ process]
     }, no-label: "invalid", {
-      fc-end[Alright bye]
+      fc-end(fill: color.red)[Alright bye]
     })
-  })
+  }, extrude: (0, 2))
   fc-end[Followup and end]
 }, if-yes-label: "Yas", if-no-label: "Non", debug: true)
